@@ -3,3 +3,6 @@
 
 *.vscode
 *.env
+
+# Ignore Spring Boot application.properties
+application.properties

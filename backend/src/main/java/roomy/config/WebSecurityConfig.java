@@ -24,6 +24,7 @@ public class WebSecurityConfig {
     private static final String[] publicRoutes = {
             "/error",
             "/auth/**",
+            "/health",
             "/ws/**",
             "/topic/**",
             "/app/**",
