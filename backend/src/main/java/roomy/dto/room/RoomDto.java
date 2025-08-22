@@ -48,6 +48,4 @@ public class RoomDto {
     private int maxOccupancy;
 
     private Long userId;
-
-    // Getters and Setters
 }

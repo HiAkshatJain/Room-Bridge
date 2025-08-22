@@ -5,11 +5,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import roomy.dto.room.RoomDto;
+import roomy.dto.room.RoomReviewDto;
+import roomy.dto.room.RoomWithReviewsDto;
 import roomy.entities.Room;
 import roomy.entities.User;
 import roomy.entities.enums.RoomStatus;
 import roomy.exceptions.ResourceNotFoundException;
 import roomy.repositories.RoomRepository;
+import roomy.repositories.RoomReviewRepository;
 import roomy.repositories.UserRepository;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -31,6 +34,7 @@ public class RoomService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final RoomRepository roomRepository;
+    private final RoomReviewRepository reviewRepository;
 
 
 
@@ -64,7 +68,7 @@ public class RoomService {
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
 
         if (!room.getUser().getId().equals(user.getId())) {
-           throw new AccessDeniedException("You are not authorized to update this room");
+            throw new AccessDeniedException("You are not authorized to update this room");
         }
 
         room.setStatus(status);
@@ -146,4 +150,31 @@ public class RoomService {
         return modelMapper.map(room, RoomDto.class);
     }
 
+
+    public List<RoomWithReviewsDto> getRoomsByLocation(String location) {
+        List<Room> rooms = roomRepository.findByLocationContainingIgnoreCase(location);
+
+        return rooms.stream().map(room -> {
+            RoomWithReviewsDto dto = modelMapper.map(room, RoomWithReviewsDto.class);
+            dto.setUserId(room.getUser() != null ? room.getUser().getId() : null);
+
+            List<RoomReviewDto> reviews = reviewRepository.findByRoom(room)
+                    .stream()
+                    .map(r -> {
+                        RoomReviewDto reviewDto = new RoomReviewDto();
+                        reviewDto.setId(r.getId());
+                        reviewDto.setRoomId(r.getRoom().getId());
+                        reviewDto.setUserId(r.getUser() != null ? r.getUser().getId() : null);
+                        reviewDto.setUserName(r.getUser() != null ? r.getUser().getName() : null);
+                        reviewDto.setRating(r.getRating());
+                        reviewDto.setReviewComment(r.getReviewComment());
+                        reviewDto.setCreatedAt(r.getCreatedAt());
+                        return reviewDto;
+                    })
+                    .collect(Collectors.toList());
+
+            dto.setReviews(reviews);
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }

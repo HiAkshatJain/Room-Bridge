@@ -2,7 +2,3 @@
 __pycache__
 .ipynb_checkpoints
 .env
-
-
-# Untouched Part For Github
-utils

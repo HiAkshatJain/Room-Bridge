@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import roomy.advice.ApiError;
 import roomy.dto.room.RoomDto;
+import roomy.dto.room.RoomWithReviewsDto;
 import roomy.dto.room.UpdateRoomStatusDto;
 import roomy.entities.Room;
 import roomy.entities.User;
@@ -27,7 +28,7 @@ public class RoomController {
 
     private final RoomService roomService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<RoomDto> createRoom(@Valid @RequestBody RoomDto roomDto, @AuthenticationPrincipal User user) {
 
         RoomDto created = roomService.createRoom(roomDto, user);
@@ -91,6 +92,12 @@ public class RoomController {
         return ResponseEntity.ok(updatedRoom);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<RoomWithReviewsDto>> getRoomsByLocation(
+                                                @RequestParam String location) {
+        List<RoomWithReviewsDto> rooms = roomService.getRoomsByLocation(location);
+        return ResponseEntity.ok(rooms);
+    }
 
 
 
