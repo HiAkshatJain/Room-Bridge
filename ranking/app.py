@@ -37,7 +37,6 @@ def ranked_rooms():
     try:
         data = fetch_property(f"http://localhost:8081/api/room/search?location={location}")
         ranked_data = rank(data)
-        print(data)
 
         set_cached_rank(location, ranked_data)
 
