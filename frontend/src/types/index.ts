@@ -36,3 +36,13 @@ export interface AuthState {
   user: User | null;
   loading: boolean;
 }
+
+export interface FormData {
+  fullName: string;
+  address: string;
+  phoneNumber: string;
+  bio: string;
+  profileImageUrl: string;
+  verificationStatus: boolean;
+  socialLinks: string;
+}

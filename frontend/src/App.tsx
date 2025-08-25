@@ -10,6 +10,7 @@ import { HomePage } from '@/pages/HomePage';
 import { RoomsPage } from '@/pages/RoomsPage';
 import { ChatPage } from '@/pages/ChatPage';
 import { ProfilePage } from '@/pages/ProfilePage';
+import Form from './components/createform/form';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Routes>
               {/* Auth routes */}
               <Route path="/auth/:type" element={<AuthPage />} />
+              <Route path="/create" element={<Form />} />
               <Route path="/login" element={<Navigate to="/auth/login" replace />} />
               <Route path="/signup" element={<Navigate to="/auth/signup" replace />} />
               <Route path="/forgot-password" element={<Navigate to="/auth/forgot-password" replace />} />
