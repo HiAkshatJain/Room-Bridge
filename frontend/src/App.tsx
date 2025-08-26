@@ -34,6 +34,8 @@ import ChatPage from './pages/chat/ChatPage';
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import DocumentVerificationPage from './pages/admin/DocumentVerificationPage';
+import AdminUserFuncPage from './pages/admin/AdminUserFuncPage';
+import AdminRoomFuncPage from './pages/admin/AdminRoomFuncPage';
 
 const App: React.FC = () => {
   return (
@@ -134,19 +136,38 @@ const App: React.FC = () => {
             <Route
               path="/admin"
               element={
-                <ProtectedRoute adminOnly>
+                // <ProtectedRoute adminOnly>
                   <Layout><AdminDashboard /></Layout>
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
             <Route
               path="/admin/documents"
               element={
-                <ProtectedRoute adminOnly>
+                // <ProtectedRoute adminOnly>
                   <Layout><DocumentVerificationPage /></Layout>
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/admin/users"
+              element={
+                // <ProtectedRoute adminOnly>
+                  <Layout><AdminUserFuncPage /></Layout>
+                // </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/rooms"
+              element={
+                // <ProtectedRoute adminOnly>
+                  <Layout><AdminRoomFuncPage /></Layout>
+                // </ProtectedRoute>
+              }
+            />
+
             {/* 404 Route */}
             <Route
               path="*"

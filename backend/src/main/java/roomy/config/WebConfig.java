@@ -6,13 +6,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/")
-                .addResourceLocations(   "file:uploads/profile-image/",  // Profile images
-                        "file:uploads/documents/");
-
+                .addResourceLocations(
+                        "file:uploads/",                 // General uploads
+                        "file:uploads/profile-image/",   // Profile images
+                        "file:uploads/documents/"        // Documents
+                );
     }
 }
 

@@ -15,6 +15,7 @@ const ProfilePage: React.FC = () => {
     address: '',
     bio: '',
     socialLinks: '',
+    profileImageUrl: '',
     verificationStatus: false,
   });
 
@@ -25,6 +26,7 @@ const ProfilePage: React.FC = () => {
   const fetchProfile = async () => {
     try {
       const response = await ApiService.getProfile();
+      console.log(response.data)
       setProfile(response.data);
       setFormData(response.data);
     } catch (error) {
@@ -120,7 +122,7 @@ const ProfilePage: React.FC = () => {
               <div className="h-24 w-24 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
                 {profile?.profileImageUrl ? (
                   <img
-                    src={profile.profileImageUrl}
+                    src={`http://localhost:8081${profile.profileImageUrl}`}
                     alt="Profile"
                     className="h-full w-full object-cover"
                   />

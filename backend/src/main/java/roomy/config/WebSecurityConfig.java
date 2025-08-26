@@ -33,7 +33,7 @@ public class WebSecurityConfig {
             "/ws/**",
             "/topic/**",
             "/app/**",
-
+            "/uploads/**"
     };
 
     @Bean
@@ -44,13 +44,13 @@ public class WebSecurityConfig {
                         // Public routes
                         .requestMatchers(publicRoutes).permitAll()
 
-
+                        // Chat APIs
                         .requestMatchers(HttpMethod.POST, "/api/chat/send").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/chat/conversation").permitAll()
 
                         // Room APIs
-                        .requestMatchers(HttpMethod.GET, "/api/room/**").permitAll()  // anyone can view rooms
-                        .requestMatchers(HttpMethod.POST, "/api/room/**").authenticated() // only logged-in users can create rooms
+                        .requestMatchers(HttpMethod.GET, "/api/room/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/room/**").authenticated()
 
                         // Room reviews
                         .requestMatchers(HttpMethod.POST, "/api/room-reviews/**").authenticated()
@@ -83,10 +83,11 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Auth-Token"));
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

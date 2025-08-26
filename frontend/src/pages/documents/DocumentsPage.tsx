@@ -16,6 +16,7 @@ const DocumentsPage: React.FC = () => {
   const fetchDocuments = async () => {
     try {
       const response = await ApiService.getMyDocuments();
+      console.log(response)
       setDocuments(response.data);
     } catch (error) {
       console.error('Failed to fetch documents:', error);
@@ -28,9 +29,12 @@ const DocumentsPage: React.FC = () => {
   const handleFileUpload = async (file: File) => {
     if (!file) return;
 
+    console.log(file)
+
     setIsUploading(true);
     try {
-      await ApiService.uploadDocument(file);
+      const resp = await ApiService.uploadDocument(file);
+      console.log(resp)
       toast.success('Document uploaded successfully');
       fetchDocuments();
     } catch (error: any) {
