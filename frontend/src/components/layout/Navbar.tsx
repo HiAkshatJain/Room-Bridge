@@ -1,197 +1,99 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
-import {
-  MessageCircle,
-  Menu,
-  X,
-  User,
-  LogOut,
-  Settings,
-} from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { Home, User, MessageCircle, Building, LogOut, Settings, Shield } from 'lucide-react';
 
-export const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
+const Navbar: React.FC = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Rooms', href: '/rooms' },
-    { name: 'Features', href: '#features' },
-    { name: 'About', href: '#about' },
-  ];
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const isAdmin = user?.roles.includes('ADMIN');
 
   return (
-    <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+    <nav className="bg-white shadow-lg border-b">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <MessageCircle className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Room Bridge
-            </span>
+            <Building className="h-8 w-8 text-blue-600" />
+            <span className="text-xl font-bold text-gray-800">Room Bridge</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-
-          {/* Desktop Auth */}
-          <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar} />
-                      <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user?.username}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile">
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
+            <Link to="/rooms" className="text-gray-600 hover:text-blue-600 transition-colors">
+              All Rooms
+            </Link>
+            {user && (
               <>
-                <Link to="/auth/login">
-                  <Button variant="ghost">Sign In</Button>
+                <Link to="/dashboard" className="text-gray-600 hover:text-blue-600 transition-colors">
+                  Dashboard
                 </Link>
-                <Link to="/auth/signup">
-                  <Button>Get Started</Button>
+                <Link to="/my-rooms" className="text-gray-600 hover:text-blue-600 transition-colors">
+                  My Rooms
+                </Link>
+                <Link to="/chat" className="text-gray-600 hover:text-blue-600 transition-colors">
+                  Chat
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 border-t">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="pt-4 pb-3 border-t">
-                {isAuthenticated ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center px-3">
-                      <Avatar className="h-8 w-8 mr-3">
-                        <AvatarImage src={user?.avatar} />
-                        <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="text-sm font-medium">{user?.username}</div>
-                        <div className="text-xs text-muted-foreground">{user?.email}</div>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <Link
-                        to="/profile"
-                        className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        to="/settings"
-                        className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Settings
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logout();
-                          setIsOpen(false);
-                        }}
-                        className="block w-full text-left px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-                      >
-                        Sign out
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Link to="/auth/login" onClick={() => setIsOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start">
-                        Sign In
-                      </Button>
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <div className="relative group">
+                <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600">
+                  <User className="h-5 w-5" />
+                  <span className="hidden md:block">Account</span>
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <Link to="/profile" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </Link>
+                  <Link to="/documents" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Documents
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin Panel
                     </Link>
-                    <Link to="/auth/signup" onClick={() => setIsOpen(false)}>
-                      <Button className="w-full">Get Started</Button>
-                    </Link>
-                  </div>
-                )}
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Link
+                  to="/login"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
 };
+
+export default Navbar;

@@ -28,7 +28,7 @@ public class RoomController {
 
     private final RoomService roomService;
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<RoomDto> createRoom(@Valid @RequestBody RoomDto roomDto, @AuthenticationPrincipal User user) {
 
         RoomDto created = roomService.createRoom(roomDto, user);

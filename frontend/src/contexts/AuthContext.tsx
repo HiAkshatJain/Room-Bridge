@@ -1,106 +1,84 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { User, AuthState } from '@/types';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, AuthResponse, LoginData, SignupData } from '../types';
+import ApiService from '../services/api';
+import toast from 'react-hot-toast';
 
-const API_URL = 'http://localhost:8081/auth';
-
-interface AuthContextType extends AuthState {
-  isUpdatingProfile: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string) => Promise<boolean>;
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  login: (data: LoginData) => Promise<void>;
+  signup: (data: SignupData) => Promise<void>;
   logout: () => void;
-  updateProfile: (data: Partial<User>) => Promise<void>;
-  verifyOtp: (email: string, otp: string) => Promise<boolean>;
-  forgotPassword: (email: string) => Promise<boolean>;
-  resetPassword: (email: string, otp: string, password: string) => Promise<boolean>;
+  verifyOtp: (email: string, otp: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    user: null,
-    loading: true,
-  });
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    const user = localStorage.getItem('user');
-    if (token && user) {
-      setAuthState({
-        isAuthenticated: true,
-        user: JSON.parse(user),
-        loading: false,
-      });
-    } else {
-      setAuthState(prev => ({ ...prev, loading: false }));
+    const storedUser = localStorage.getItem('user');
+    const accessToken = localStorage.getItem('accessToken');
+    
+    if (storedUser && accessToken) {
+      setUser(JSON.parse(storedUser));
     }
+    setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (data: LoginData) => {
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
-      const { accessToken, refreshToken, ...user } = response.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('user', JSON.stringify(user));
-      setAuthState({
-        isAuthenticated: true,
-        user,
-        loading: false,
-      });
-      return true;
-    } catch (error) {
-      console.error('Login failed', error);
-      return false;
+      const response = await ApiService.login(data);
+      const authData: AuthResponse = response.data;
+      
+      localStorage.setItem('accessToken', authData.accessToken);
+      localStorage.setItem('refreshToken', authData.refreshToken);
+      
+      const userData: User = {
+        id: authData.id,
+        email: data.email,
+        name: '', // Will be fetched from profile
+        roles: authData.roles,
+      };
+      
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      
+      toast.success('Login successful!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Login failed');
+      throw error;
     }
   };
 
-  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
+  const signup = async (data: SignupData) => {
     try {
-      await axios.post(`${API_URL}/signup`, { name, email, password, roles: ['USER'] });
-      return true;
-    } catch (error) {
-      console.error('Signup failed', error);
-      return false;
+      console.log(data)
+      await ApiService.signup(data);
+      toast.success('Registration successful! Please verify your email.');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Registration failed');
+      throw error;
     }
   };
 
-  const verifyOtp = async (email: string, otp: string): Promise<boolean> => {
+  const verifyOtp = async (email: string, otp: string) => {
     try {
-      // Use a different endpoint for password reset OTP verification
-      const url = window.location.pathname.includes('forgot-password')
-        ? `${API_URL}/verify-otp/forgot-password`
-        : `${API_URL}/verify-otp`;
-      await axios.post(url, { email, otp });
-      return true;
-    } catch (error) {
-      console.error('OTP verification failed', error);
-      return false;
-    }
-  };
-
-  const forgotPassword = async (email: string): Promise<boolean> => {
-    try {
-      await axios.post(`${API_URL}/forgot-password`, { email });
-      return true;
-    } catch (error) {
-      console.error('Forgot password failed', error);
-      return false;
-    }
-  };
-
-  const resetPassword = async (email: string, otp: string, password: string): Promise<boolean> => {
-    try {
-      await axios.post(`${API_URL}/verify-otp/password`, { email, otp, newPassword: password });
-      return true;
-    } catch (error) {
-      console.error('Reset password failed', error);
-      return false;
+      await ApiService.verifyOtp({ email, otp });
+      toast.success('Email verified successfully!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'OTP verification failed');
+      throw error;
     }
   };
 
@@ -108,38 +86,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-    setAuthState({
-      isAuthenticated: false,
-      user: null,
-      loading: false,
-    });
-    navigate('/auth/login');
+    setUser(null);
+    toast.success('Logged out successfully');
   };
 
-  const updateProfile = async (data: Partial<User>) => {
-    // This needs a backend endpoint
-    console.log('Updating profile with', data);
-  };
-
-  const value = {
-    ...authState,
-    isUpdatingProfile,
-    login,
-    signup,
-    logout,
-    updateProfile,
-    verifyOtp,
-    forgotPassword,
-    resetPassword,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return (
+    <AuthContext.Provider value={{
+      user,
+      isLoading,
+      login,
+      signup,
+      logout,
+      verifyOtp,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

@@ -1,38 +1,85 @@
 export interface User {
-  id: string;
-  username: string;
+  id: number;
   email: string;
-  avatar?: string;
-  bio?: string;
-  joinedAt: string;
-  isOnline: boolean;
+  name: string;
+  roles: string[];
+}
+
+export interface AuthResponse {
+  id: number;
+  accessToken: string;
+  refreshToken: string;
+  roles: string[];
+}
+
+export interface Profile {
+  id?: number;
+  userId?: number;
+  fullName: string;
+  phoneNumber: string;
+  address: string;
+  bio: string;
+  profileImageUrl?: string;
+  verificationStatus: boolean;
+  socialLinks?: string;
+  createdAt?: string;
 }
 
 export interface Room {
-  id: string;
-  name: string;
+  id?: number;
+  title: string;
   description: string;
-  avatar?: string;
-  memberCount: number;
-  isPrivate: boolean;
-  tags: string[];
-  createdAt: string;
-  lastMessage?: Message;
+  price: number;
+  location: string;
+  imageUrls: string[];
+  furnished: boolean;
+  roomType: 'PRIVATE' | 'SHARED';
+  status?: 'AVAILABLE' | 'RENTED' | 'MAINTENANCE';
+  availableFrom: string;
+  genderPreference: 'MALE' | 'FEMALE' | 'ANY';
+  maxOccupancy: number;
+  isAvailable: boolean;
+  userId?: number;
+  available?: boolean;
 }
 
-export interface Message {
-  id: string;
+export interface Document {
+  id: number;
+  documentName: string;
+  documentPath: string;
+  verificationStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
+}
+
+export interface Review {
+  id?: number;
+  roomId: number;
+  userId: number;
+  userName?: string;
+  rating: number;
+  reviewComment: string;
+  createdAt?: string;
+}
+
+export interface ChatMessage {
   content: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar?: string;
-  roomId: string;
   timestamp: string;
-  type: 'text' | 'image' | 'file';
+  senderId: number;
+  receiverId: number;
 }
 
-export interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  loading: boolean;
+export interface SignupData {
+  email: string;
+  password: string;
+  name: string;
+  roles: string[];
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+export interface OTPData {
+  email: string;
+  otp: string;
 }
