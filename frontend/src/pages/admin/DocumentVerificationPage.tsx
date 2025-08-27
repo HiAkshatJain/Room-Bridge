@@ -246,7 +246,7 @@ const DocumentVerificationPage: React.FC = () => {
                       <Eye className="h-5 w-5" />
                     </button>
                     
-                    <button
+                    {/* <button
                       onClick={() => {
                         const link = document.createElement('a');
                         link.href = `http://localhost:8081${document.documentPath}`;
@@ -257,7 +257,7 @@ const DocumentVerificationPage: React.FC = () => {
                       title="Download Document"
                     >
                       <Download className="h-5 w-5" />
-                    </button>
+                    </button> */}
 
                     {document.verificationStatus === 'PENDING' && (
                       <div className="flex space-x-2 ml-4">
