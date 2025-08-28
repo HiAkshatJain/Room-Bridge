@@ -2,9 +2,11 @@ package roomy.controller;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import roomy.dto.ChatMessageDto;
+import roomy.dto.RecentChatDto;
 import roomy.dto.UserDto;
 import roomy.entities.ChatMessage;
 import roomy.entities.User;
@@ -72,4 +74,10 @@ public class ChatRestController {
             dto.setEmail(user.getEmail());
             return dto;
         }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<RecentChatDto>> getRecentChats(@AuthenticationPrincipal User loginUser) {
+        List<RecentChatDto> recentChats = chatService.getRecentChats(loginUser.getId());
+        return ResponseEntity.ok(recentChats);
+    }
 }
