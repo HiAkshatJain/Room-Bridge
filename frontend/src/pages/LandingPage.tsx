@@ -1,8 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ApiService from '../services/api';
 import { Building, Search, Shield, MessageCircle, Star, MapPin } from 'lucide-react';
+import { Room } from '../types';
 
 const LandingPage: React.FC = () => {
+
+  const [rooms, setRooms] = useState<Room[]>([]);
+   
+    useEffect(() => {
+      fetchRooms();
+    }, []);
+  
+    const fetchRooms = async () => {
+      try {
+        const response = await ApiService.getRandomRooms();
+        setRooms(response.data);
+        console.log(response.data)
+      } catch (error) {
+        console.error('Failed to fetch rooms:', error);
+      } 
+    };
+
+
+
+
+
+
+
+
+
+
+
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -80,22 +110,42 @@ const LandingPage: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="h-48 bg-gradient-to-r from-blue-400 to-purple-500"></div>
+            {rooms.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+              >
+                {/* Room Image */}
+                <div className="h-48 w-full overflow-hidden">
+                  <img
+                    src={`http://localhost:8081${item.imageUrls?.[0] || "/placeholder.png"}`}
+                    alt={item.title || "Room image"}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+
                 <div className="p-6">
+                  {/* Location */}
                   <div className="flex items-center text-gray-500 mb-2">
                     <MapPin className="h-4 w-4 mr-1" />
-                    <span className="text-sm">Delhi, India</span>
+                    <span className="text-sm">{item.location}</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Cozy Private Room</h3>
-                  <p className="text-gray-600 mb-4">Fully furnished room with all amenities included.</p>
+
+                  {/* Title */}
+                  <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+
+                  {/* Description */}
+                  <p className="text-gray-600 mb-4">{item.description}</p>
+
+                  {/* Price + Max Occupancy */}
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-green-600">₹8,000/mo</span>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="text-sm text-gray-600 ml-1">4.8</span>
-                    </div>
+                    <span className="text-2xl font-bold text-green-600">
+                      ₹ {item.price}/mo
+                    </span>
+                    <span className="text-sm text-gray-700 bg-gray-100 px-2 py-1 rounded-lg">
+                      Max Occupancy: {item.maxOccupancy}
+                    </span>
                   </div>
                 </div>
               </div>

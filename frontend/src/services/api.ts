@@ -78,7 +78,6 @@ class ApiService {
     );
   }
 
-
   async signup(data: any) {
     return this.api.post('/auth/signup', data);
   }
@@ -184,6 +183,14 @@ class ApiService {
 
   async getAllRooms() {
     return this.api.get('/api/room');
+  }
+
+  async getRandomRooms() {
+    return this.api.get('/api/room/random?count=3')
+  }
+
+  async getChatUser() {
+    return this.api.get('/api/chat/users');
   }
 
   async getRoomById(id: number) {

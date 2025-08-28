@@ -30,11 +30,26 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     // Mock chat users - in real app, this would come from an API
-    setChatUsers([
-      { id: 1, name: 'John Doe', lastMessage: 'Is the room still available?', timestamp: '2 hours ago' },
-      { id: 2, name: 'Jane Smith', lastMessage: 'Thank you for the information', timestamp: '1 day ago' },
-      { id: 3, name: 'Mike Johnson', lastMessage: 'When can I visit?', timestamp: '3 days ago' },
-    ]);
+    // setChatUsers([
+    //   { id: 1, name: 'John Doe', lastMessage: 'Is the room still available?', timestamp: '2 hours ago' },
+    //   { id: 2, name: 'Jane Smith', lastMessage: 'Thank you for the information', timestamp: '1 day ago' },
+    //   { id: 3, name: 'Mike Johnson', lastMessage: 'When can I visit?', timestamp: '3 days ago' },
+    // ]);
+
+    const fetchChatUser = async () => {
+        try {
+          const response = await ApiService.getChatUser();
+          setChatUsers(response?.data)
+          console.log(response.data)
+        } catch (error) {
+          console.error('Failed to fetch Chat Users:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+    fetchChatUser()
+    
 
     if (targetUserId) {
       setSelectedUserId(parseInt(targetUserId));
@@ -128,14 +143,22 @@ const ChatPage: React.FC = () => {
                       }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                          <User className="h-5 w-5 text-white" />
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center overflow-hidden">
+                          {/* Optional: You can switch back to the icon if needed */}
+                          {/* <User className="h-5 w-5 text-white" /> */}
+                          
+                          <img
+                            src={`https://api.dicebear.com/5.x/initials/svg?seed=${encodeURIComponent(chatUser.name || 'User')}`}
+                            alt="profile image"
+                            className="w-full h-full object-cover rounded-full"
+                          />
                         </div>
+
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 truncate">{chatUser.name}</p>
-                          <p className="text-sm text-gray-500 truncate">{chatUser.lastMessage}</p>
+                          {/* <p className="text-sm text-gray-500 truncate">{chatUser.lastMessage}</p> */}
                         </div>
-                        <span className="text-xs text-gray-400">{chatUser.timestamp}</span>
+                        {/* <span className="text-xs text-gray-400">{chatUser.timestamp}</span> */}
                       </div>
                     </button>
                   ))}
@@ -146,99 +169,120 @@ const ChatPage: React.FC = () => {
 
           {/* Chat Area */}
           <div className="flex-1 flex flex-col">
-            {selectedUserId ? (
-              <>
-                {/* Chat Header */}
-                <div className="p-4 border-b bg-white">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                      <User className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{selectedUser?.name}</h3>
-                      <p className="text-sm text-gray-500">Online</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {isLoading ? (
-                    <div className="flex justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    </div>
-                  ) : messages.length === 0 ? (
-                    <div className="text-center py-8">
-                      <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600">No messages yet</p>
-                      <p className="text-sm text-gray-500 mt-2">Start the conversation!</p>
-                    </div>
-                  ) : (
-                    messages.map((message, index) => (
-                      <div
-                        key={index}
-                        className={`flex ${
-                          message.senderId === user?.id ? 'justify-end' : 'justify-start'
-                        }`}
-                      >
-                        <div
-                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                            message.senderId === user?.id
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-200 text-gray-900'
-                          }`}
-                        >
-                          <p>{message.content}</p>
-                          <p
-                            className={`text-xs mt-1 ${
-                              message.senderId === user?.id
-                                ? 'text-blue-100'
-                                : 'text-gray-500'
-                            }`}
-                          >
-                            {new Date(message.timestamp).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                {/* Message Input */}
-                <form onSubmit={sendMessage} className="p-4 border-t bg-white">
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type your message..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      disabled={isSending}
+          {selectedUserId ? (
+            <>
+              {/* Chat Header (Sticky) */}
+              <div className="sticky top-0 z-10 bg-white border-b p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center overflow-hidden">
+                    {/* <User className="h-5 w-5 text-white" />
+                    OR use image version instead of icon: */}
+                    <img
+                      src={`https://api.dicebear.com/5.x/initials/svg?seed=${encodeURIComponent(selectedUser?.name || 'User')}`}
+                      alt="profile image"
+                      className="w-full h-full object-cover rounded-full"
                     />
-                    <button
-                      type="submit"
-                      disabled={!newMessage.trim() || isSending}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Send className="h-5 w-5" />
-                    </button>
+                   
                   </div>
-                </form>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Select a conversation</h3>
-                  <p className="text-gray-600">Choose a conversation from the list to start messaging</p>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{selectedUser?.name}</h3>
+                    {/* <p className="text-sm text-gray-500">Online</p> */}
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 pt-20 space-y-4">
+                {isLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="text-center py-8">
+                    <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">No messages yet</p>
+                    <p className="text-sm text-gray-500 mt-2">Start the conversation!</p>
+                  </div>
+                ) : (
+                  messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`flex ${
+                        message.senderId === user?.id ? 'justify-end' : 'justify-start'
+                      }`}
+                    >
+                      <div
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          message.senderId === user?.id
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-900'
+                        }`}
+                      >
+                        <p>{message.content}</p>
+                        <p
+                          className={`text-xs mt-1 ${
+                            message.senderId === user?.id ? 'text-blue-100' : 'text-gray-500'
+                          }`}
+                        >
+                          {new Date(message.timestamp).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Message Input */}
+              <form onSubmit={sendMessage} className="p-4 border-t bg-white">
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type your message..."
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    disabled={isSending}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newMessage.trim() || isSending}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Send className="h-5 w-5" />
+                  </button>
+                </div>
+              </form>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Select a conversation</h3>
+                <p className="text-gray-600">Choose a conversation from the list to start messaging</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
         </div>
       </div>
     </div>
