@@ -83,6 +83,9 @@ public class ChatService {
                         ? user.getProfile().getProfileImageUrl()
                         : null;
 
+                System.out.println(profileImage);
+                System.out.println(user.getProfile());
+
                 recentChats.add(RecentChatDto.builder()
                         .userId(user.getId())
                         .name(user.getName())

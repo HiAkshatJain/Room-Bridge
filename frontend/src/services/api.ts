@@ -158,6 +158,18 @@ class ApiService {
     return this.api.put(`/documents/${id}/verify`, { status });
   }
 
+  async uploadProfileImage(file: File) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    return this.api.post('/profile/upload-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+
 
   async createRoom(data: any) {
     return this.api.post('/api/room', data);
@@ -176,7 +188,7 @@ class ApiService {
   }
 
   async getChatUser() {
-    return this.api.get('/api/chat/users');
+    return this.api.get('/api/chat/recent');
   }
 
   async getRoomById(id: number) {

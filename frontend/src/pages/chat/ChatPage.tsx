@@ -7,10 +7,11 @@ import { Send, MessageCircle, User } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface ChatUser {
-  id: number;
+  userId: number;
   name: string;
+  profileImageUrl: null | string;
   lastMessage?: string;
-  timestamp?: string;
+  lastMessageTime: string;
 }
 
 const ChatPage: React.FC = () => {
@@ -27,6 +28,33 @@ const ChatPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  function timeAgo(dateString: string): string {
+    const now = new Date();
+    const past = new Date(dateString);
+    const seconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+    if (isNaN(seconds)) return "Invalid date";
+
+    const intervals: { label: string; seconds: number }[] = [
+      { label: 'year', seconds: 31536000 },
+      { label: 'month', seconds: 2592000 },
+      { label: 'day', seconds: 86400 },
+      { label: 'hour', seconds: 3600 },
+      { label: 'minute', seconds: 60 },
+      { label: 'second', seconds: 1 },
+    ];
+
+    for (const interval of intervals) {
+      const count = Math.floor(seconds / interval.seconds);
+      if (count >= 1) {
+        return `${count} ${interval.label}${count > 1 ? 's' : ''} ago`;
+      }
+    }
+
+    return 'just now';
+  }
+
 
   useEffect(() => {
     // Mock chat users - in real app, this would come from an API
@@ -107,7 +135,7 @@ const ChatPage: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const selectedUser = chatUsers.find(u => u.id === selectedUserId);
+  const selectedUser = chatUsers.find(u => u.userId === selectedUserId);
 
   return (
     <div className="max-w-7xl mx-auto px-4">
@@ -136,10 +164,10 @@ const ChatPage: React.FC = () => {
                 <div className="divide-y">
                   {chatUsers.map((chatUser) => (
                     <button
-                      key={chatUser.id}
-                      onClick={() => setSelectedUserId(chatUser.id)}
+                      key={chatUser.userId}
+                      onClick={() => setSelectedUserId(chatUser.userId)}
                       className={`w-full p-4 text-left hover:bg-white transition-colors ${
-                        selectedUserId === chatUser.id ? 'bg-white border-r-2 border-blue-500' : ''
+                        selectedUserId === chatUser.userId ? 'bg-white border-r-2 border-blue-500' : ''
                       }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -148,7 +176,7 @@ const ChatPage: React.FC = () => {
                           {/* <User className="h-5 w-5 text-white" /> */}
                           
                           <img
-                            src={`https://api.dicebear.com/5.x/initials/svg?seed=${encodeURIComponent(chatUser.name || 'User')}`}
+                            src={chatUser.profileImageUrl || `https://api.dicebear.com/5.x/initials/svg?seed=${encodeURIComponent(chatUser.name || 'User')}`}
                             alt="profile image"
                             className="w-full h-full object-cover rounded-full"
                           />
@@ -156,9 +184,9 @@ const ChatPage: React.FC = () => {
 
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 truncate">{chatUser.name}</p>
-                          {/* <p className="text-sm text-gray-500 truncate">{chatUser.lastMessage}</p> */}
+                          <p className="text-sm text-gray-500 truncate">{chatUser.lastMessage}</p>
                         </div>
-                        {/* <span className="text-xs text-gray-400">{chatUser.timestamp}</span> */}
+                        <span className="text-xs text-gray-400">{ timeAgo(chatUser.lastMessageTime)}</span>
                       </div>
                     </button>
                   ))}

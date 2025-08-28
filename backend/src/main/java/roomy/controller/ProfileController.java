@@ -70,10 +70,4 @@ public class ProfileController {
         ProfileDto createdProfile = profileService.createProfile(currentUser.getId(), profileDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProfile);
     }
-
-
-
-
-
-
 }

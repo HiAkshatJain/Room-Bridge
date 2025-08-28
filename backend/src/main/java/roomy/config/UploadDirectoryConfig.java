@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 @Configuration
 public class UploadDirectoryConfig {
 
-    @Value("${profile.image.upload-dir:uploads/profile-image}")
+    @Value("${profile.image.upload-dir:uploads/profile-images}")
     private String profileImageDir;
 
     @Value("${document.upload-dir:uploads/documents}")
