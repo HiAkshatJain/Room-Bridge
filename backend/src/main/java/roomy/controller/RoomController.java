@@ -101,6 +101,12 @@ public class RoomController {
     }
 
 
+    @GetMapping("/random")
+    public List<RoomDto> getRandomRooms(@RequestParam int count) {
+        return roomService.getRandomRooms(count);
+    }
+
+
 
 
 }

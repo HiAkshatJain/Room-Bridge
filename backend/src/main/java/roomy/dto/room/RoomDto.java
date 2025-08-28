@@ -1,20 +1,15 @@
 package roomy.dto.room;
 
-import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import roomy.entities.User;
 import roomy.entities.enums.RoomStatus;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+
 @Data
 public class RoomDto {
     private Long id;
@@ -32,7 +27,8 @@ public class RoomDto {
 
     private List<String> imageUrls;
 
-    private boolean isAvailable ;
+    @JsonProperty("isAvailable")
+    private boolean isAvailable;
 
     private boolean furnished;
 

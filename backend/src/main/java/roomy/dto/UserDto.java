@@ -19,7 +19,5 @@ public class UserDto {
     private String name;
     private Set<Role> roles;
 
-    private String otp;
-    private LocalDateTime otpExpiry;
 
 }

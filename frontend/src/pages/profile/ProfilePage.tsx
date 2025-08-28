@@ -45,7 +45,7 @@ const ProfilePage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (profile) {
         await ApiService.updateProfile(formData);
@@ -127,9 +127,17 @@ const ProfilePage: React.FC = () => {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <User className="h-12 w-12 text-white" />
+                  <img
+                    src={`https://api.dicebear.com/5.x/initials/svg?seed=${encodeURIComponent(
+                      profile?.fullName || 'User'
+                    )}`}
+                    alt="Avatar"
+                    className="h-full w-full object-cover"
+                  />
                 )}
               </div>
+
+              {/* Upload Button */}
               <label className="absolute bottom-0 right-0 bg-white rounded-full p-1 border cursor-pointer hover:bg-gray-50">
                 <Camera className="h-4 w-4 text-gray-600" />
                 <input
@@ -143,17 +151,17 @@ const ProfilePage: React.FC = () => {
                 />
               </label>
             </div>
+
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-gray-900">
                 {profile?.fullName || 'Complete your profile'}
               </h2>
               <div className="flex items-center mt-2">
                 <div
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    profile?.verificationStatus
+                  className={`px-3 py-1 rounded-full text-sm ${profile?.verificationStatus
                       ? 'bg-green-100 text-green-800'
                       : 'bg-yellow-100 text-yellow-800'
-                  }`}
+                    }`}
                 >
                   {profile?.verificationStatus ? 'Verified' : 'Pending Verification'}
                 </div>
