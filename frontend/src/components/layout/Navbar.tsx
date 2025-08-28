@@ -40,7 +40,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link to="/location-search" className="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />
-                  Search by Location
+                  Search
                 </Link>
                 <Link to="/chat" className="text-gray-600 hover:text-blue-600 transition-colors">
                   Chat

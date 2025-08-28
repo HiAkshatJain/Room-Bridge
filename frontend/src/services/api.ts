@@ -135,30 +135,16 @@ class ApiService {
     return this.api.get('/profile/me');
   }
 
-  async uploadProfileImage(file: File) {
+  async uploadDocument(file: File) {
     const formData = new FormData();
-    formData.append('image', file);
-    return this.api.post('/profile/upload-image', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    formData.append('file', file);
+
+    return this.api.post('/documents/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
   }
-
-  // Document endpoints
-  // async uploadDocument(file: File) {
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-  //   return this.api.post('/documents/upload', formData, {
-  //     headers: { 'Content-Type': 'multipart/form-data' },
-  //   });
-  // }
-
-  async uploadDocument(file: File) {
-  const formData = new FormData();
-  formData.append('file', file); 
-
-  return this.api.post('/documents/upload', formData);
-}
-
 
   async getMyDocuments() {
     return this.api.get('/documents/my-documents');
