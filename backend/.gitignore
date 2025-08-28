@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+
+# Spring Boot sensitive configs
+backend/src/main/resources/application.properties
+
+
+# Uploads folder
+backend/uploads/
