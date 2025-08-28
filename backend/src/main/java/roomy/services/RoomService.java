@@ -179,6 +179,41 @@ public class RoomService {
         }).collect(Collectors.toList());
     }
 
+    public List<RoomWithReviewsDto> getRoomsByQuery(String query) {
+        String lowerQuery = query.toLowerCase();
+
+        List<Room> allRooms = roomRepository.findAll();
+
+        return allRooms.stream()
+                .filter(room ->
+                        (room.getTitle() != null && room.getTitle().toLowerCase().contains(lowerQuery)) ||
+                                (room.getLocation() != null && room.getLocation().toLowerCase().contains(lowerQuery))
+                )
+                .map(room -> {
+                    RoomWithReviewsDto dto = modelMapper.map(room, RoomWithReviewsDto.class);
+                    dto.setUserId(room.getUser() != null ? room.getUser().getId() : null);
+
+                    List<RoomReviewDto> reviews = reviewRepository.findByRoom(room)
+                            .stream()
+                            .map(r -> {
+                                RoomReviewDto reviewDto = new RoomReviewDto();
+                                reviewDto.setId(r.getId());
+                                reviewDto.setRoomId(r.getRoom().getId());
+                                reviewDto.setUserId(r.getUser() != null ? r.getUser().getId() : null);
+                                reviewDto.setUserName(r.getUser() != null ? r.getUser().getName() : null);
+                                reviewDto.setRating(r.getRating());
+                                reviewDto.setReviewComment(r.getReviewComment());
+                                reviewDto.setCreatedAt(r.getCreatedAt());
+                                return reviewDto;
+                            })
+                            .collect(Collectors.toList());
+
+                    dto.setReviews(reviews);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
 
     public List<RoomDto> getRandomRooms(int count) {
         List<Room> rooms = roomRepository.findAllByIsAvailableTrue(); // fetch all available rooms

@@ -100,13 +100,17 @@ public class RoomController {
         return ResponseEntity.ok(rooms);
     }
 
+    @GetMapping("/query")
+    public ResponseEntity<List<RoomWithReviewsDto>> getRoomsByQuery(
+            @RequestParam String query
+    ) {
+        List<RoomWithReviewsDto> rooms = roomService.getRoomsByQuery(query);
+        return ResponseEntity.ok(rooms);
+    }
 
     @GetMapping("/random")
     public List<RoomDto> getRandomRooms(@RequestParam int count) {
         return roomService.getRandomRooms(count);
     }
-
-
-
 
 }

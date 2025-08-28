@@ -1,13 +1,14 @@
+//@ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Room } from '../../types';
-import ApiService from '../../services/api';
-import { MapPin, Users, Wifi, Star, Search } from 'lucide-react';
+import RankingApiService from '../../services/rankingApi';
+import { MapPin, Star, Search } from 'lucide-react';
 
 const SearchRooms: React.FC = () => {
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [allRooms, setAllRooms] = useState<Room[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     roomType: '',
     furnished: '',
@@ -15,28 +16,22 @@ const SearchRooms: React.FC = () => {
     maxPrice: '',
   });
 
-  // Debounced API fetch when search term changes
   useEffect(() => {
     const handler = setTimeout(() => {
       if (searchTerm.trim() !== '') {
         fetchRooms();
-        console.log(searchTerm)
       } else {
-        setRooms([]); // clear results if no search
+        setAllRooms([]);
       }
-    }, 500); // debounce delay
-
+    }, 500);
     return () => clearTimeout(handler);
-  }, [searchTerm, filters]);
+  }, [searchTerm]);
 
   const fetchRooms = async () => {
     setIsLoading(true);
     try {
-      // const response = await ApiService.searchRooms({
-      //   search: searchTerm,
-      //   ...filters,
-      // });
-      // setRooms(response.data || []);
+      const response = await RankingApiService.getRoomsQuery(searchTerm);
+      setAllRooms(response?.data?.data || []);
     } catch (error) {
       console.error('Failed to fetch rooms:', error);
     } finally {
@@ -48,6 +43,15 @@ const SearchRooms: React.FC = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
+  // Apply filters on the frontend
+  const filteredRooms = allRooms.filter((room) => {
+    if (filters.roomType && room.roomType !== filters.roomType) return false;
+    if (filters.furnished && String(room.furnished) !== filters.furnished) return false;
+    if (filters.genderPreference && room.genderPreference !== filters.genderPreference) return false;
+    if (filters.maxPrice && room.price > parseInt(filters.maxPrice)) return false;
+    return true;
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4">
       <div className="mb-8">
@@ -55,7 +59,7 @@ const SearchRooms: React.FC = () => {
         <p className="text-gray-600">Find rooms by title or location</p>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search & Filters */}
       <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2">
@@ -114,7 +118,7 @@ const SearchRooms: React.FC = () => {
       {/* Results */}
       {isLoading ? (
         <div className="text-center py-12">Loading...</div>
-      ) : rooms.length === 0 && searchTerm.trim() !== '' ? (
+      ) : filteredRooms.length === 0 && searchTerm.trim() !== '' ? (
         <div className="text-center py-12">
           <div className="bg-gray-100 rounded-full p-6 w-24 h-24 mx-auto mb-4 flex items-center justify-center">
             <Search className="h-8 w-8 text-gray-400" />
@@ -122,11 +126,11 @@ const SearchRooms: React.FC = () => {
           <h3 className="text-xl font-semibold text-gray-900 mb-2">No rooms found</h3>
           <p className="text-gray-600">Try adjusting your search criteria</p>
         </div>
-      ) : rooms.length === 0 ? (
+      ) : filteredRooms.length === 0 ? (
         <div className="text-center py-12 text-gray-500">Start typing to search rooms</div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rooms.map((room) => (
+          {filteredRooms.map((room) => (
             <Link
               key={room.id}
               to={`/rooms/${room.id}`}
@@ -135,7 +139,11 @@ const SearchRooms: React.FC = () => {
               <div className="relative h-48 rounded-t-xl overflow-hidden">
                 {room.imageUrls?.[0] ? (
                   <img
-                    src={room.imageUrls[0].startsWith('http') ? room.imageUrls[0] : `http://localhost:8081${room.imageUrls[0]}`}
+                    src={
+                      room.imageUrls[0].startsWith('http')
+                        ? room.imageUrls[0]
+                        : `http://localhost:8081${room.imageUrls[0]}`
+                    }
                     alt={room.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -150,14 +158,45 @@ const SearchRooms: React.FC = () => {
                   <MapPin className="h-4 w-4 mr-1" />
                   <span className="text-sm">{room.location}</span>
                 </div>
+
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{room.title}</h3>
                 <p className="text-gray-600 text-sm mb-4 line-clamp-2">{room.description}</p>
-                <div className="flex justify-between items-center">
+
+                <div className="flex justify-between items-center mb-2">
                   <span className="text-2xl font-bold text-green-600">
                     ₹{room.price.toLocaleString()}/mo
                   </span>
                   <span className="text-sm text-gray-500">{room.genderPreference}</span>
                 </div>
+
+                {room?.reviews?.length > 0 && (
+                  <div className="flex items-center space-x-1 text-sm text-yellow-500">
+                    {(() => {
+                      const avgRating =
+                        room.reviews.reduce((sum, review) => sum + review.rating, 0) / room.reviews.length;
+                      const fullStars = Math.floor(avgRating);
+
+                      return (
+                        <>
+                          {[...Array(5)].map((_, index) => (
+                            <Star
+                              key={index}
+                              className={`w-4 h-4 ${
+                                index < fullStars ? 'fill-yellow-500 text-yellow-500' : 'text-gray-300'
+                              }`}
+                              fill={index < fullStars ? 'currentColor' : 'none'}
+                              stroke="currentColor"
+                            />
+                          ))}
+                          <div className="flex justify-between text-gray-600 w-full text-sm">
+                            <span>{avgRating.toFixed(1)}</span>
+                            <span>({room.reviews.length})</span>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             </Link>
           ))}

@@ -239,10 +239,10 @@ const RoomsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
                     <span className="text-sm text-gray-600 ml-1">4.5</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex justify-between items-center">

@@ -29,10 +29,7 @@ const Navbar: React.FC = () => {
             <Link to="/rooms" className="text-gray-600 hover:text-blue-600 transition-colors">
               All Rooms
             </Link>
-            <Link to="/location-search" className="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
-              <MapPin className="h-4 w-4 mr-1" />
-              Search by Location
-            </Link>
+
             {user && (
               <>
                 <Link to="/dashboard" className="text-gray-600 hover:text-blue-600 transition-colors">
@@ -40,6 +37,10 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link to="/my-rooms" className="text-gray-600 hover:text-blue-600 transition-colors">
                   My Rooms
+                </Link>
+                <Link to="/location-search" className="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  Search by Location
                 </Link>
                 <Link to="/chat" className="text-gray-600 hover:text-blue-600 transition-colors">
                   Chat

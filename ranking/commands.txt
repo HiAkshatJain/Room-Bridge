@@ -3,5 +3,8 @@ python -m venv .venv
 
 deactivate
 
-pip freeze > requirements.txt 
+pip freeze > requirements.txt  -> To Write the requirements
+
+
+
 pip install -r requirements.txt
