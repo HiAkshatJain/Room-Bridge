@@ -62,13 +62,16 @@ public class ProfileService {
     }
 
 
+
+
     @Transactional
     public ProfileDto updateProfile(Long userId, ProfileDto profileDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         Profile profile = profileRepository.findByUser(user).orElse(new Profile());
-        profile.setUser(user);
+
+        // Set profile fields
         profile.setFullName(profileDto.getFullName());
         profile.setPhoneNumber(profileDto.getPhoneNumber());
         profile.setAddress(profileDto.getAddress());
@@ -77,11 +80,17 @@ public class ProfileService {
         profile.setVerificationStatus(profileDto.isVerificationStatus());
         profile.setSocialLinks(profileDto.getSocialLinks());
 
-        // createdAt is set automatically on persist (do not update here)
+        // Link both sides
+        profile.setUser(user);
+        user.setProfile(profile);
 
-        Profile savedProfile = profileRepository.save(profile);
-        return modelMapper.map(savedProfile, ProfileDto.class);
+        // Save user to update the FK (profile_id)
+        User savedUser = userRepository.save(user);
+
+        return modelMapper.map(savedUser.getProfile(), ProfileDto.class);
     }
+
+
 
 
     @Transactional
@@ -89,12 +98,11 @@ public class ProfileService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        if (profileRepository.findByUser(user).isPresent()) {
+        if (user.getProfile() != null) {
             throw new IllegalArgumentException("Profile already exists for user id: " + userId);
         }
 
         Profile profile = new Profile();
-        profile.setUser(user);
         profile.setFullName(profileDto.getFullName());
         profile.setPhoneNumber(profileDto.getPhoneNumber());
         profile.setAddress(profileDto.getAddress());
@@ -103,10 +111,15 @@ public class ProfileService {
         profile.setVerificationStatus(profileDto.isVerificationStatus());
         profile.setSocialLinks(profileDto.getSocialLinks());
 
-        Profile savedProfile = profileRepository.save(profile);
-        return modelMapper.map(savedProfile, ProfileDto.class);
-    }
+        // Link both sides
+        profile.setUser(user);
+        user.setProfile(profile);
 
+        // Save user (cascades to profile because of CascadeType.ALL)
+        User savedUser = userRepository.save(user);
+
+        return modelMapper.map(savedUser.getProfile(), ProfileDto.class);
+    }
 
     public ProfileDto uploadProfileImageForLoggedInUser(User user, MultipartFile file) throws IOException {
 

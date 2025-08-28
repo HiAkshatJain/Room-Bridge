@@ -3,16 +3,15 @@ package roomy.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomy.dto.ChatMessageDto;
+import roomy.dto.RecentChatDto;
 import roomy.entities.ChatMessage;
 import roomy.entities.User;
 import roomy.repositories.ChatMessageRepository;
 import roomy.repositories.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +56,50 @@ public class ChatService {
         users.addAll(senders);
 
         return new ArrayList<>(users);
+    }
+
+    public List<RecentChatDto> getRecentChats(Long loginUserId) {
+        List<ChatMessage> allChats = chatRepository.findAllChatsOfUser(loginUserId);
+
+        // ✅ Collect all unique other user IDs
+        Set<Long> otherUserIds = allChats.stream()
+                .map(chat -> chat.getSender().getId().equals(loginUserId)
+                        ? chat.getReceiver().getId()
+                        : chat.getSender().getId())
+                .collect(Collectors.toSet());
+
+        List<RecentChatDto> recentChats = new ArrayList<>();
+
+        for (Long otherUserId : otherUserIds) {
+            ChatMessage lastMessage = chatRepository
+                    .findTopBySenderIdAndReceiverIdOrSenderIdAndReceiverIdOrderByTimestampDesc(
+                            loginUserId, otherUserId,
+                            otherUserId, loginUserId
+                    );
+
+            userRepository.findById(otherUserId).ifPresent(user -> {
+                // ✅ Fetch profile automatically because of EAGER
+                String profileImage = (user.getProfile() != null)
+                        ? user.getProfile().getProfileImageUrl()
+                        : null;
+
+                recentChats.add(RecentChatDto.builder()
+                        .userId(user.getId())
+                        .name(user.getName())
+                        .profileImageUrl(profileImage)
+                        .lastMessage(lastMessage != null ? lastMessage.getContent() : null)
+                        .lastMessageTime(lastMessage != null ? lastMessage.getTimestamp() : null)
+                        .build());
+            });
+        }
+
+        // ✅ Sort by last message time
+        recentChats.sort(Comparator.comparing(
+                RecentChatDto::getLastMessageTime,
+                Comparator.nullsLast(Comparator.reverseOrder())
+        ));
+
+        return recentChats;
     }
 
 }
