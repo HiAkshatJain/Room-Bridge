@@ -13,4 +13,5 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     Optional<Room> findByIdAndUserId(Long roomId, Long userId);
     List<Room> findByLocationContainingIgnoreCase(String location);
+    List<Room> findAllByIsAvailableTrue();
 }

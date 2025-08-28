@@ -6,8 +6,10 @@ import roomy.entities.User;
 import roomy.entities.UserDocument;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserDocumentRepository extends JpaRepository<UserDocument, Long> {
     List<UserDocument> findByUser(User user);
+    Optional<UserDocument> findByIdAndUser(Long id, User user);
 }

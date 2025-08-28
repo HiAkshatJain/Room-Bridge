@@ -28,7 +28,7 @@ public class RoomController {
 
     private final RoomService roomService;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<RoomDto> createRoom(@Valid @RequestBody RoomDto roomDto, @AuthenticationPrincipal User user) {
 
         RoomDto created = roomService.createRoom(roomDto, user);
@@ -94,10 +94,18 @@ public class RoomController {
 
     @GetMapping("/search")
     public ResponseEntity<List<RoomWithReviewsDto>> getRoomsByLocation(
-                                                @RequestParam String location) {
+            @RequestParam String location
+    ) {
         List<RoomWithReviewsDto> rooms = roomService.getRoomsByLocation(location);
         return ResponseEntity.ok(rooms);
     }
+
+
+    @GetMapping("/random")
+    public List<RoomDto> getRandomRooms(@RequestParam int count) {
+        return roomService.getRandomRooms(count);
+    }
+
 
 
 

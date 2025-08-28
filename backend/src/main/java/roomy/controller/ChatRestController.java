@@ -1,16 +1,25 @@
 package roomy.controller;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import roomy.dto.ChatMessageDto;
+import roomy.dto.UserDto;
 import roomy.entities.ChatMessage;
+import roomy.entities.User;
 import roomy.services.ChatService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/chat")
+
 public class ChatRestController {
 
     private final ChatService chatService;
+
+
 
     public ChatRestController(ChatService chatService) {
         this.chatService = chatService;
@@ -45,4 +54,22 @@ public class ChatRestController {
                 .timestamp(message.getTimestamp())
                 .build();
     }
+
+
+        @GetMapping("/users")
+        public List<UserDto> getChatUsers(@AuthenticationPrincipal User loggedInUser) {
+            List<User> users = chatService.getChatUsers(loggedInUser.getId());
+
+            return users.stream()
+                    .map(this::convertToDto)
+                    .toList();
+        }
+
+        private UserDto convertToDto(User user) {
+            UserDto dto = new UserDto();
+            dto.setId(user.getId());
+            dto.setName(user.getName());
+            dto.setEmail(user.getEmail());
+            return dto;
+        }
 }

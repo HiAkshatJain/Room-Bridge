@@ -9,7 +9,10 @@ import roomy.repositories.ChatMessageRepository;
 import roomy.repositories.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -43,4 +46,17 @@ public class ChatService {
         messages1.sort((a,b) -> a.getTimestamp().compareTo(b.getTimestamp()));
         return messages1;
     }
+
+
+    public List<User> getChatUsers(Long userId) {
+        List<User> receivers = chatRepository.findReceivers(userId);
+        List<User> senders = chatRepository.findSenders(userId);
+
+        Set<User> users = new HashSet<>();
+        users.addAll(receivers);
+        users.addAll(senders);
+
+        return new ArrayList<>(users);
+    }
+
 }

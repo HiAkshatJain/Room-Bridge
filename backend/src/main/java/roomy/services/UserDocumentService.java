@@ -32,31 +32,6 @@ public class UserDocumentService {
     @Value("${document.upload-dir}")
     private String uploadDir;
 
-    // Upload document
-//    public UserDocument uploadDocument(Long userId, MultipartFile file) throws IOException {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        Path uploadPath = Paths.get(uploadDir);
-//        if (!Files.exists(uploadPath)) {
-//            Files.createDirectories(uploadPath);
-//        }
-//
-//        String originalFileName = file.getOriginalFilename();
-//        String extension = originalFileName != null && originalFileName.contains(".")
-//                ? originalFileName.substring(originalFileName.lastIndexOf("."))
-//                : "";
-//
-//        String newFileName = UUID.randomUUID().toString() + extension;
-//        Path filePath = uploadPath.resolve(newFileName);
-//        file.transferTo(filePath.toFile());
-//
-//        UserDocument document = new UserDocument();
-//        document.setUser(user);
-//        document.setDocumentName(originalFileName);
-//        document.setDocumentPath("/uploads/documents/" + newFileName);
-//        return documentRepository.save(document);
-//    }
 
 
     public UserDocument uploadDocument(Long userId, MultipartFile file) throws IOException {
@@ -89,48 +64,7 @@ public class UserDocumentService {
     }
 
 
-//    // Admin verification
-//    public UserDocument verifyDocument(Long documentId, VerificationStatus status) {
-//        UserDocument document = documentRepository.findById(documentId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-//
-//        // Update verification status
-//        document.setVerificationStatus(status);
-//        UserDocument savedDocument = documentRepository.save(document);
-//
-//        // Prepare email details
-//        String userEmail = document.getUser().getEmail();
-//        String subject = "Document Verification Status";
-//        String body;
-//
-//        switch (status) {
-//            case APPROVED:
-//                body = "Dear " + document.getUser().getName() + ",\n\n"
-//                        + "Your document \"" + document.getDocumentName() + "\" has been successfully verified and approved.\n"
-//                        + "You can now continue using our platform with verified status.\n\n"
-//                        + "Best regards,\nSupport Team";
-//                break;
-//
-//            case REJECTED:
-//                body = "Dear " + document.getUser().getName() + ",\n\n"
-//                        + "Unfortunately, your document \"" + document.getDocumentName() + "\" could not be approved.\n"
-//                        + "Please upload a correct and valid document to proceed with verification.\n\n"
-//                        + "Best regards,\nSupport Team";
-//                break;
-//
-//            default:
-//                body = "Dear " + document.getUser().getName() + ",\n\n"
-//                        + "Your document \"" + document.getDocumentName() + "\" is currently pending review.\n"
-//                        + "We will notify you once verification is complete.\n\n"
-//                        + "Best regards,\nSupport Team";
-//                break;
-//        }
-//
-//        // Send the email
-//        emailService.sendEmail(userEmail, subject, body);
-//
-//        return savedDocument;
-//    }
+
 
 
     public UserDocumentDto verifyDocument(Long documentId, VerificationStatus status) {
@@ -184,6 +118,24 @@ public class UserDocumentService {
                         doc.getVerificationStatus()
                 )) // <- close map parenthesis here
                 .collect(Collectors.toList());
+    }
+
+    public void deleteUserDocument(Long userId, Long documentId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        UserDocument document = documentRepository.findByIdAndUser(documentId, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found or not yours"));
+
+        // Optionally also delete the physical file from storage
+        Path path = Paths.get(document.getDocumentPath());
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete document file", e);
+        }
+
+        documentRepository.delete(document);
     }
 
 

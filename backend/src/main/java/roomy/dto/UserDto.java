@@ -18,9 +18,6 @@ public class UserDto {
     private String email;
     private String name;
     private Set<Role> roles;
-    private List<Room> rooms ;
-    private String otp;
-    private LocalDateTime otpExpiry;
-    private VerificationStatus verificationStatus;
-    private ProfileDto profileDto;
+
+
 }

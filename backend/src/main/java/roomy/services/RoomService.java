@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -68,7 +69,7 @@ public class RoomService {
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
 
         if (!room.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("You are not authorized to update this room");
+           throw new AccessDeniedException("You are not authorized to update this room");
         }
 
         room.setStatus(status);
@@ -177,4 +178,27 @@ public class RoomService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+
+    public List<RoomDto> getRandomRooms(int count) {
+        List<Room> rooms = roomRepository.findAllByIsAvailableTrue(); // fetch all available rooms
+
+        // Shuffle the list randomly
+        Collections.shuffle(rooms);
+
+        // Pick the first 'count' rooms
+        List<Room> selectedRooms = rooms.stream()
+                .limit(count)
+                .toList();
+
+        // Map to RoomDto
+        return selectedRooms.stream()
+                .map(room -> {
+                    RoomDto dto = modelMapper.map(room, RoomDto.class);
+                    dto.setUserId(room.getUser() != null ? room.getUser().getId() : null);
+                    return dto;
+                })
+                .toList();
+    }
+
 }

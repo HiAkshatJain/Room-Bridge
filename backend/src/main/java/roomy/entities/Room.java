@@ -1,6 +1,7 @@
 package roomy.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import lombok.Setter;
@@ -54,7 +55,8 @@ public class Room {
     private RoomStatus status = RoomStatus.AVAILABLE;
 
     @Column(name = "is_available", nullable = false)
-    private boolean isAvailable ;
+    @JsonProperty("isAvailable")
+    private boolean isAvailable;
 
     private LocalDate availableFrom;
 

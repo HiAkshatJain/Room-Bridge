@@ -25,9 +25,9 @@ public class RoomReviewService {
     public RoomReviewDto addReview(RoomReviewRequestDto request) {
 
         // Optional: check if user already reviewed
-//        if(reviewRepository.existsByRoomIdAndUserId(request.getRoomId(), request.getUserId())) {
-//            throw new RuntimeException("User has already reviewed this room");
-//        }
+        if(reviewRepository.existsByRoomIdAndUserId(request.getRoomId(), request.getUserId())) {
+            throw new RuntimeException("User has already reviewed this room");
+        }
 
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));

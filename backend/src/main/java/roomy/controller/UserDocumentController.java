@@ -47,6 +47,15 @@ public class UserDocumentController {
         return ResponseEntity.ok(docs);
     }
 
+    @DeleteMapping("/my-documents/{documentId}")
+    public ResponseEntity<String> deleteDocument(
+            @PathVariable Long documentId,
+            @AuthenticationPrincipal User currentUser) {
+
+        documentService.deleteUserDocument(currentUser.getId(), documentId);
+        return ResponseEntity.ok("Document deleted successfully");
+    }
+
     @PutMapping("/{id}/verify")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDocumentDto> verifyDocument(
