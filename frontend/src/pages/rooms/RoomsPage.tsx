@@ -25,9 +25,17 @@ const RoomsPage: React.FC = () => {
   }, [rooms, searchTerm, filters]);
 
   const fetchRooms = async () => {
+    function shuffleArray(array:any) {
+      return array
+        .map((value:any) => ({ value, sort: Math.random() })) // assign random sort key
+        .sort((a:any, b:any) => a.sort - b.sort)                  // sort by random key
+        //@ts-ignore
+        .map(({ value }) => value);                       // extract values back
+    }
     try {
       const response = await ApiService.getAllRooms();
-      setRooms(response.data);
+      const shuffled = shuffleArray(response.data);
+      setRooms(shuffled);
     } catch (error) {
       console.error('Failed to fetch rooms:', error);
     } finally {
@@ -134,10 +142,9 @@ const RoomsPage: React.FC = () => {
             onChange={(e) => handleFilterChange('genderPreference', e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">Any Gender</option>
+            <option value="">Gender</option>
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
-            <option value="ANY">Any</option>
           </select>
 
           <input

@@ -37,6 +37,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import DocumentVerificationPage from './pages/admin/DocumentVerificationPage';
 import AdminUserFuncPage from './pages/admin/AdminUserFuncPage';
 import AdminRoomFuncPage from './pages/admin/AdminRoomFuncPage';
+import SearchRooms from './pages/rooms/SearchRooms';
 
 const App: React.FC = () => {
   return (
@@ -88,6 +89,10 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+
+            
+            <Route path="/location-search" element={<Layout><SearchRooms /></Layout>} />
+
             <Route
               path="/rooms/:id/images"
               element={

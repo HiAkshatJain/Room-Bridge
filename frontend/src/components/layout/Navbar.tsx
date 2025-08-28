@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Home, User, MessageCircle, Building, LogOut, Settings, Shield } from 'lucide-react';
+import { Home, User, MessageCircle, Building, LogOut, Settings, Shield, MapPin } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -18,14 +18,20 @@ const Navbar: React.FC = () => {
     <nav className="bg-white shadow-lg border-b">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Building className="h-8 w-8 text-blue-600" />
             <span className="text-xl font-bold text-gray-800">Room Bridge</span>
           </Link>
 
+          {/* Main links */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/rooms" className="text-gray-600 hover:text-blue-600 transition-colors">
               All Rooms
+            </Link>
+            <Link to="/location-search" className="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+              <MapPin className="h-4 w-4 mr-1" />
+              Search by Location
             </Link>
             {user && (
               <>
@@ -42,6 +48,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
+          {/* Right side (account / login) */}
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="relative group">
@@ -75,10 +82,7 @@ const Navbar: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link
-                  to="/login"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
-                >
+                <Link to="/login" className="text-gray-600 hover:text-blue-600 transition-colors">
                   Login
                 </Link>
                 <Link
