@@ -65,6 +65,7 @@ public class UserService implements UserDetailsService {
 
         otpService.sendOtp(savedUser.getEmail());
 
+
         return modelMapper.map(savedUser, UserDto.class);
     }
 

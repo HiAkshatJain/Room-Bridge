@@ -9,11 +9,9 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class RoomReviewRequestDto {
 
-    @NotNull
-    private Long roomId;
 
     @NotNull
-    private Long userId;
+    private Long roomId;
 
     @Min(1)
     @Max(5)

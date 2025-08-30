@@ -98,6 +98,8 @@ public class UserDocumentService {
         // Return DTO
         return new UserDocumentDto(
                 savedDocument.getId(),
+                savedDocument.getUser().getId(),
+                savedDocument.getUser().getName(),
                 savedDocument.getDocumentName(),
                 savedDocument.getDocumentPath(),
                 savedDocument.getVerificationStatus()
@@ -113,6 +115,8 @@ public class UserDocumentService {
                 .stream()
                 .map(doc -> new UserDocumentDto(
                         doc.getId(),
+                        doc.getUser().getId(),
+                        doc.getUser().getName(),
                         doc.getDocumentName(),
                         doc.getDocumentPath(),
                         doc.getVerificationStatus()
@@ -136,6 +140,21 @@ public class UserDocumentService {
         }
 
         documentRepository.delete(document);
+    }
+
+
+    public List<UserDocumentDto> getAllDocuments() {
+        return documentRepository.findAll()
+                .stream()
+                .map(doc -> new UserDocumentDto(
+                        doc.getId(),
+                        doc.getUser().getId(),
+                        doc.getUser().getName(),
+                        doc.getDocumentName(),
+                        doc.getDocumentPath(),
+                        doc.getVerificationStatus()
+                ))
+                .collect(Collectors.toList());
     }
 
 

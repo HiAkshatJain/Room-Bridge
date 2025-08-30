@@ -45,5 +45,7 @@ public class RoomDto {
 
     private Long userId;
 
+    private String userName;
+
 
 }

@@ -1,5 +1,6 @@
 package roomy.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,12 @@ import roomy.dto.room.RoomReviewDto;
 import roomy.dto.room.RoomWithReviewsDto;
 import roomy.entities.Room;
 import roomy.entities.User;
+import roomy.entities.UserDocument;
 import roomy.entities.enums.RoomStatus;
 import roomy.exceptions.ResourceNotFoundException;
 import roomy.repositories.RoomRepository;
 import roomy.repositories.RoomReviewRepository;
+import roomy.repositories.UserDocumentRepository;
 import roomy.repositories.UserRepository;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -36,6 +39,7 @@ public class RoomService {
     private final ModelMapper modelMapper;
     private final RoomRepository roomRepository;
     private final RoomReviewRepository reviewRepository;
+   private final UserDocumentRepository userDocumentRepository;
 
 
 
@@ -83,6 +87,31 @@ public class RoomService {
 
         roomRepository.delete(room);
     }
+    public void deleteRoomByAdmin(Long roomId, User currentUser) {
+        // 🔐 Check admin role
+        boolean isAdmin = currentUser.getRoles()
+                .stream()
+                .anyMatch(role -> role.name().equals("ADMIN"));
+
+        if (!isAdmin) {
+            throw new AccessDeniedException("Only admins can delete rooms.");
+        }
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found with id " + roomId));
+
+        roomRepository.delete(room);
+    }
+//    public void deleteRoomById(Long id) {
+//        if (!roomRepository.existsById(id)) {
+//            throw new ResourceNotFoundException("Room not found with id: " + id);
+//        }
+//        roomRepository.deleteById(id);
+//    }
+//
+
+
+
 
 
     public RoomDto uploadRoomImages(Long roomId, MultipartFile[] images, User user) {

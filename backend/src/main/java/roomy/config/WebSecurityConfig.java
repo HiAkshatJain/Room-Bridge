@@ -64,6 +64,7 @@ public class WebSecurityConfig {
                         // Profiles
                         .requestMatchers(HttpMethod.POST, "/profile/upload-image").authenticated()
                         .requestMatchers(HttpMethod.GET, "/profile/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // Any other request needs authentication
                         .anyRequest().authenticated()
