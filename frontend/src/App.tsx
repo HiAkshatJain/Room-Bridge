@@ -142,35 +142,35 @@ const App: React.FC = () => {
             <Route
               path="/admin"
               element={
-                // <ProtectedRoute adminOnly>
+                <ProtectedRoute adminOnly>
                   <Layout><AdminDashboard /></Layout>
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/documents"
               element={
-                // <ProtectedRoute adminOnly>
+                <ProtectedRoute adminOnly>
                   <Layout><DocumentVerificationPage /></Layout>
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
 
             <Route
               path="/admin/users"
               element={
-                // <ProtectedRoute adminOnly>
+                <ProtectedRoute adminOnly>
                   <Layout><AdminUserFuncPage /></Layout>
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
 
             <Route
               path="/admin/rooms"
               element={
-                // <ProtectedRoute adminOnly>
+                <ProtectedRoute adminOnly>
                   <Layout><AdminRoomFuncPage /></Layout>
-                // </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
 

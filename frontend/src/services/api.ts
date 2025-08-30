@@ -232,6 +232,23 @@ class ApiService {
   async getConversation(senderId: number, receiverId: number) {
     return this.api.get(`/api/chat/conversation?senderId=${senderId}&receiverId=${receiverId}`);
   }
+
+  async getAllUsers() {
+    return this.api.get(`/admin/users`);
+  }
+
+  async getPendingDocuments() {
+    return this.api.get(`/admin/documents`);
+  }
+
+  async deleteUsers(id:number) {
+    return this.api.delete(`/admin/${id}`);
+  }
+
+  async deleteRoomById(id: number){
+    return await this.api.delete(`/admin/room/${id}`);
+  }
+
 }
 
 export default new ApiService();

@@ -24,22 +24,52 @@ const AdminDashboard: React.FC = () => {
 
   const fetchAdminData = async () => {
     try {
-      // Note: These would be separate admin API endpoints
-      // For now, we'll use mock data and available endpoints
-      
-      // Mock stats - in real app, these would come from admin APIs
+      const Users = await ApiService.getAllUsers();
+      const totalUsers = Users.data.length || 0;
+
+      const PendingDocuments = await ApiService.getPendingDocuments();
+
+      let pendingCount = 0;
+      for (let i = 0; i < PendingDocuments.data?.length; i++) {
+        if (PendingDocuments.data[i].verificationStatus === "PENDING") {
+          pendingCount++;
+        }
+      }
+
+      for (let i = 0; i < Users.data?.length; i++) {
+        if (Users.data[i].verificationStatus === "PENDING") {
+          pendingCount++;
+        }
+      }
+
+      const Rooms = await ApiService.getAllRooms();
+      const totalRooms = Rooms.data.length || 0;
+
+      let adminCount = 0;
+
+      for (const user of Users.data) {
+        if (user.roles.includes('ADMIN')) {
+          adminCount++;
+        }
+      }
+
       setStats({
-        totalUsers: 156,
-        pendingDocuments: 12,
-        totalRooms: 89,
-        verifiedUsers: 134,
+        totalUsers: totalUsers || 0,
+        pendingDocuments: pendingCount || 0,
+        totalRooms: totalRooms || 0,
+        verifiedUsers: adminCount || 0,
       });
 
       // This would be an admin endpoint to get all pending documents
       // For now, we'll use the user's documents endpoint as a placeholder
       try {
         const response = await ApiService.getMyDocuments();
-        setDocuments(response.data);
+        
+        //@ts-ignore
+        const pendingDocuments = response.data.filter(doc => doc.verificationStatus === "PENDING");
+
+        console.log(pendingDocuments)
+        setDocuments(pendingDocuments);
       } catch (error) {
         // If user doesn't have documents, that's fine for demo
         setDocuments([]);
@@ -151,7 +181,7 @@ const AdminDashboard: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Verified Users</p>
+              <p className="text-sm text-gray-600 mb-1">Total Admins</p>
               <p className="text-2xl font-bold text-gray-900">{stats.verifiedUsers}</p>
             </div>
             <div className="bg-purple-100 p-3 rounded-lg">

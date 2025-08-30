@@ -24,57 +24,11 @@ const DocumentVerificationPage: React.FC = () => {
 
   const fetchDocuments = async () => {
     try {
-      // Note: This would be an admin endpoint to get all documents
-      // For demo purposes, we'll use the user's documents endpoint
-      const response = await ApiService.getMyDocuments();
-      
-      // Mock additional documents for demo
-      const mockDocuments = [
-        {
-          id: 101,
-          documentName: 'Aadhar_Card_John_Doe.pdf',
-          documentPath: '/uploads/documents/aadhar-john.pdf',
-          verificationStatus: 'PENDING' as const,
-        },
-        {
-          id: 102,
-          documentName: 'PAN_Card_Jane_Smith.pdf',
-          documentPath: '/uploads/documents/pan-jane.pdf',
-          verificationStatus: 'PENDING' as const,
-        },
-        {
-          id: 103,
-          documentName: 'Passport_Mike_Johnson.pdf',
-          documentPath: '/uploads/documents/passport-mike.pdf',
-          verificationStatus: 'APPROVED' as const,
-        },
-        {
-          id: 104,
-          documentName: 'License_Sarah_Wilson.pdf',
-          documentPath: '/uploads/documents/license-sarah.pdf',
-          verificationStatus: 'REJECTED' as const,
-        },
-      ];
+      const response = await ApiService.getPendingDocuments();
 
-      setDocuments([...response.data, ...mockDocuments]);
+      setDocuments([...response.data]);
     } catch (error) {
-      console.error('Failed to fetch documents:', error);
-      // Use mock data if API fails
-      const mockDocuments = [
-        {
-          id: 101,
-          documentName: 'Aadhar_Card_John_Doe.pdf',
-          documentPath: '/uploads/documents/aadhar-john.pdf',
-          verificationStatus: 'PENDING' as const,
-        },
-        {
-          id: 102,
-          documentName: 'PAN_Card_Jane_Smith.pdf',
-          documentPath: '/uploads/documents/pan-jane.pdf',
-          verificationStatus: 'PENDING' as const,
-        },
-      ];
-      setDocuments(mockDocuments);
+      console.log("Error in API fetching")
     } finally {
       setIsLoading(false);
     }
@@ -245,19 +199,6 @@ const DocumentVerificationPage: React.FC = () => {
                     >
                       <Eye className="h-5 w-5" />
                     </button>
-                    
-                    {/* <button
-                      onClick={() => {
-                        const link = document.createElement('a');
-                        link.href = `http://localhost:8081${document.documentPath}`;
-                        link.download = document.documentName;
-                        link.click();
-                      }}
-                      className="p-2 text-gray-400 hover:text-green-600 transition-colors"
-                      title="Download Document"
-                    >
-                      <Download className="h-5 w-5" />
-                    </button> */}
 
                     {document.verificationStatus === 'PENDING' && (
                       <div className="flex space-x-2 ml-4">
