@@ -1,6 +1,8 @@
 package roomy.repositories;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import roomy.entities.ChatMessage;
@@ -31,4 +33,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             Long senderId1, Long receiverId1,
             Long senderId2, Long receiverId2
     );
+
+    void deleteBySenderIdOrReceiverId(Long senderId, Long receiverId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM ChatMessage c WHERE c.sender.id = :userId OR c.receiver.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

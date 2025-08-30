@@ -66,6 +66,10 @@ public class Room {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomReview> reviews = new ArrayList<>();
+
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

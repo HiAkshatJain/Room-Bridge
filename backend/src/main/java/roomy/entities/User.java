@@ -40,16 +40,15 @@ public class User implements UserDetails {
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified = false;
     private VerificationStatus verificationStatus;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Room> rooms = new ArrayList<>();
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "profile_id", referencedColumnName = "id")
-//    private Profile profile;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "profile_id", referencedColumnName = "id")
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Profile profile;
+
 
 
 

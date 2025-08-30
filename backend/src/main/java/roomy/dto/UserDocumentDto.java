@@ -10,6 +10,8 @@ import roomy.entities.enums.VerificationStatus;
 @NoArgsConstructor
 public class UserDocumentDto {
     private Long id;
+    private Long userId;
+    private String userName;
     private String documentName;
     private String documentPath;
     private VerificationStatus verificationStatus;

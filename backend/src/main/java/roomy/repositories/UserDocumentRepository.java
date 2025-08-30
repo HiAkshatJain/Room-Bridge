@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface UserDocumentRepository extends JpaRepository<UserDocument, Long> {
     List<UserDocument> findByUser(User user);
     Optional<UserDocument> findByIdAndUser(Long id, User user);
+    List<UserDocument> findByUserId(Long userId);
+    void deleteByUserId(Long userId);
 }

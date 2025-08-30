@@ -7,8 +7,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import roomy.entities.OtpVerification;
+import roomy.entities.User;
+import roomy.exceptions.ResourceNotFoundException;
 import roomy.repositories.OtpVerificationRepository;
 import org.springframework.beans.factory.annotation.Value;
+import roomy.repositories.UserRepository;
 
 
 import java.time.LocalDateTime;
@@ -24,6 +27,7 @@ public class OtpService {
 
     private final JavaMailSender mailSender;
     private final OtpVerificationRepository otpRepo;
+    private final UserRepository userRepository;
 
     @Value("${otp.expiry.minutes:5}")
     private long expiryMinutes;
@@ -33,12 +37,14 @@ public class OtpService {
         otpRepo.findByEmail(email).ifPresent(otpRepo::delete);
 
         OtpVerification otpVerification = new OtpVerification();
+
         otpVerification.setEmail(email);
         otpVerification.setOtp(otp);
         otpVerification.setExpiryTime(LocalDateTime.now().plusMinutes(expiryMinutes));
         otpVerification.setVerified(false);
 
         otpRepo.save(otpVerification);
+
         sendEmail(email, otp);
     }
 
@@ -51,6 +57,8 @@ public class OtpService {
     }
 
     public boolean verifyOtp(String email, String otp) {
+
+
         return otpRepo.findByEmail(email)
                 .filter(record -> record.getOtp().equals(otp))
                 .filter(record -> !record.isVerified())
@@ -61,5 +69,7 @@ public class OtpService {
                     return true;
                 })
                 .orElse(false);
+
+
     }
 }
