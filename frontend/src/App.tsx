@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
 import SignupPage from './pages/auth/SignupPage';
+import SignupAdminPage from './pages/auth/SignupAdminPage';
 import OTPPage from './pages/auth/OTPPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import Dashboard from './pages/Dashboard';
@@ -49,6 +50,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Layout><LandingPage /></Layout>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/admin/register/new" element={<SignupAdminPage />} />
             <Route path="/verify-otp" element={<OTPPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ApiService from '../services/api';
 import { Building, Search, Shield, MessageCircle, Star, MapPin } from 'lucide-react';
 import { Room } from '../types';
+import Footer from './footer';
 
 const LandingPage: React.FC = () => {
 
@@ -164,18 +165,12 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="py-20 bg-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Find Your Perfect Room?</h2>
-          <p className="text-xl mb-8">Join thousands of users who have found their ideal living space through Room Bridge.</p>
-          <Link
-            to="/signup"
-            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-          >
-            Start Your Journey
-          </Link>
-        </div>
-      </div>
+     
+          <Footer className="mt-20" />
+        
+      
+
+      
     </div>
   );
 };

@@ -10,6 +10,8 @@ interface AuthContextType {
   isInitialized: boolean;
   login: (data: LoginData) => Promise<void>;
   signup: (data: SignupData) => Promise<void>;
+  singupadmin: (data: SignupData) => Promise<void>;
+
   logout: () => void;
   verifyOtp: (email: string, otp: string) => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
@@ -94,7 +96,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw error;
     }
   };
-
+  const singupadmin = async (data: SignupData) => {
+    try {
+      console.log(data)
+      await ApiService.signup(data);
+      toast.success('Registration successful! Please verify your email.');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Registration failed');
+      throw error;
+    }
+  };
   const verifyOtp = async (email: string, otp: string) => {
     try {
       const response = await ApiService.verifyOtp({ email, otp });
@@ -153,6 +164,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   isInitialized,
       login,
       signup,
+      singupadmin,
       logout,
       verifyOtp,
   forgotPassword,
